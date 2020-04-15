@@ -1,0 +1,38 @@
+{
+  "name": "sparkmemo-editor",
+  "version": "1.0.0",
+  "description": "More than a Markdown Editor.",
+  "main": "main.js",
+  "scripts": {
+    "test": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sparkmemo/editor.git"
+  },
+  "keywords": [
+    "sparkmemo",
+    "editor",
+    "markdown"
+  ],
+  "author": "Tongze Wang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sparkmemo/editor/issues"
+  },
+  "homepage": "https://github.com/sparkmemo/editor#readme",
+  "devDependencies": {
+    "electron": "^8.2.2",
+    "electron-reload": "^1.5.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2"
+  },
+  "dependencies": {
+    "github-markdown-css": "^4.0.0",
+    "highlight.js": "^9.18.1",
+    "marked": "^0.8.2",
+    "mathjax": "^3.0.5",
+    "mermaid": "^8.5.0"
+  }
+}
