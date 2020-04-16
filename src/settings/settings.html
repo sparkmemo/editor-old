@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+<!--    <link href="../../node_modules/vuetify/dist/vuetify.min.css" rel="stylesheet">-->
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <style>
+        html {
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <v-app>
+        <v-content>
+            <v-container>
+                <v-col cols="12">
+                    <v-tabs color="primary" v-model="tab">
+                        <v-tab v-for="item in tabs" :key="item">
+                            {{ item }}
+                        </v-tab>
+                        <v-tabs-items v-model="tab">
+                            <v-tab-item>
+                                <p class="mt-4 mb-2">
+                                    显示语言
+                                </p>
+                                <v-select
+                                        :items="displayLang"
+                                        filled
+                                        dense
+                                        prepend-inner-icon="mdi-translate"
+                                ></v-select>
+                                <p class="mt-4 mb-2">
+                                    图片处理方式
+                                </p>
+                                <v-select
+                                        :items="picProcess"
+                                        filled
+                                        dense
+                                        prepend-inner-icon="mdi-image-multiple"
+                                ></v-select>
+                            </v-tab-item>
+                            <v-tab-item>
+                                2
+                            </v-tab-item>
+                        </v-tabs-items>
+                    </v-tabs>
+                </v-col>
+            </v-container>
+        </v-content>
+    </v-app>
+</div>
+
+<!--<script src="../../node_modules/vue/dist/vue.js"></script>-->
+<!--<script src="../../node_modules/vuetify/dist/vuetify.js"></script>-->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>

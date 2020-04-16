@@ -1,14 +1,14 @@
 const marked = require('marked');
 const hljs = require('highlight.js');
-const mermaid = require('../node_modules/mermaid/dist/mermaid.js');
+const mermaid = require('mermaid/dist/mermaid.js');
 require('./mathjax-config.js');
-require('../node_modules/mathjax/es5/tex-svg.js');
+require('mathjax/es5/tex-svg.js');
 
 const mdSourceEl = document.getElementById('mdSource');
 const mdOutputEl = document.getElementById('mdOutput');
 
 const renderer = new marked.Renderer();
-renderer.code = function (code, language) {
+renderer.code = (code, language) => {
   if ((code.match(/^sequenceDiagram/) || code.match(/^graph/)) && language.match(/mermaid/)) {
     return `<div class="mermaid">${code}</div>`;
   }

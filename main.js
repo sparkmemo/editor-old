@@ -1,10 +1,9 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
-// eslint-disable-next-line import/no-extraneous-dependencies
-require('electron-reload')(__dirname);
+const MenuTemplate = require('./menu.js');
 
-function createWindow() {
+function createEditorWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
     width: 1280,
@@ -15,16 +14,19 @@ function createWindow() {
   });
 
   // and load the index.html of the app.
-  win.loadFile(path.join('src', 'editor.html'));
+  win.loadFile(path.join('src', 'editor', 'editor.html'));
 
   // Open the DevTools.
   // win.webContents.openDevTools();
+
+  const menu = Menu.buildFromTemplate(MenuTemplate);
+  Menu.setApplicationMenu(menu);
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(createWindow);
+app.whenReady().then(createEditorWindow);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -39,7 +41,7 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
+    createEditorWindow();
   }
 });
 
