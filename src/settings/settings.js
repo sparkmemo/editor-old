@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const { dialog } = require('electron').remote;
 
 // eslint-disable-next-line

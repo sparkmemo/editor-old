@@ -1,27 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-const { app, BrowserWindow, Menu } = require('electron');
-const path = require('path');
-const MenuTemplate = require('./menu.js');
-
-function createEditorWindow() {
-  // Create the browser window.
-  const win = new BrowserWindow({
-    width: 1280,
-    height: 720,
-    webPreferences: {
-      nodeIntegration: true,
-    },
-  });
-
-  // and load the index.html of the app.
-  win.loadFile(path.join('src', 'editor', 'editor.html'));
-
-  // Open the DevTools.
-  // win.webContents.openDevTools();
-
-  const menu = Menu.buildFromTemplate(MenuTemplate);
-  Menu.setApplicationMenu(menu);
-}
+const { app, BrowserWindow } = require('electron');
+const { createEditorWindow } = require('./src/window.js');
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
