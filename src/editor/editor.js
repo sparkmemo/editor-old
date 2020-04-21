@@ -24,7 +24,11 @@ renderer.code = (code, language) => {
 
 mermaid.initialize({ startOnLoad: false, theme: 'forest' });
 
-function renderMarkdown() {
+function updateTitle() {
+  document.title = `SparkMEMO Editor - ${title}${changeSaved ? '' : '*'}`;
+}
+
+function renderMarkdown(e) {
   mdOutputEl.innerHTML = marked(mdSourceEl.value, { renderer });
   document.querySelectorAll('pre code').forEach((block) => {
     hljs.highlightBlock(block);
@@ -33,14 +37,19 @@ function renderMarkdown() {
   MathJax.typeset();
   try {
     mermaid.init(undefined, '.mermaid');
-  } catch (e) {
+  } catch (err) {
     // handling mermaid error
   }
-  changeSaved = false;
+  if (e === null || !(e.key === 'Control' || e.key === 'Shift' || e.ctrlKey === true || e.shiftKey === true)) {
+    changeSaved = false;
+  }
+  updateTitle();
 }
 
-mdSourceEl.addEventListener('keyup', () => {
-  renderMarkdown();
+updateTitle();
+
+mdSourceEl.addEventListener('keypress', (event) => {
+  renderMarkdown(event);
 });
 
 ipcRenderer.on('insertMarkdown', ((event, insertContent) => {
@@ -58,14 +67,43 @@ ipcRenderer.on('shiftCursor', ((event, indexDelta) => {
   mdSourceEl.setSelectionRange(prevSelectStart + indexDelta, prevSelectEnd + indexDelta);
 }));
 
-ipcRenderer.on('openFile', ((event, openInfo) => {
-  if (mdSourceEl.value && !changeSaved) {
-    ipcRenderer.send('openFileError', 'unsavedChange');
+ipcRenderer.on('openFile', ((event, openInfo, override) => {
+  if (!changeSaved && override === false) {
+    ipcRenderer.send('operationError', {
+      error: 'unsavedChangeWhenOpenNewDoc',
+      openInfo,
+    });
   } else {
     title = openInfo.title;
     path = openInfo.path;
     mdSourceEl.value = openInfo.content;
-    changeSaved = true;
     renderMarkdown();
+    changeSaved = true;
+    updateTitle();
   }
 }));
+
+ipcRenderer.on('exportContentReq', (event, next) => {
+  ipcRenderer.send('exportContentRes', {
+    title,
+    path,
+    changeSaved,
+    mdSource: mdSourceEl.value,
+    next,
+  });
+});
+
+ipcRenderer.on('updateFile', (event, updatedFileInfo) => {
+  title = updatedFileInfo.title;
+  path = updatedFileInfo.path;
+});
+
+ipcRenderer.on('updateTitle', (e) => {
+  changeSaved = true;
+  console.log(e, changeSaved);
+  updateTitle();
+});
+
+ipcRenderer.on('renderMarkdown', () => {
+  renderMarkdown(null);
+});

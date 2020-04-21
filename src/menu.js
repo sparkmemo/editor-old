@@ -16,10 +16,16 @@ module.exports = [
       {
         label: '保存',
         accelerator: 'CmdOrCtrl+s',
+        click(menuItem, window) {
+          window.webContents.send('exportContentReq', 'save');
+        },
       },
       {
         label: '另存为',
         accelerator: 'CmdOrCtrl+shift+s',
+        click(menuItem, window) {
+          window.webContents.send('exportContentReq', 'saveAs');
+        },
       },
       {
         type: 'separator',

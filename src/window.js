@@ -13,9 +13,14 @@ module.exports = {
       },
     });
     win.loadFile(path.join('src', 'editor', 'editor.html'));
-
+    win.webContents.openDevTools();
     const menu = Menu.buildFromTemplate(MenuTemplate);
     Menu.setApplicationMenu(menu);
+
+    win.on('close', ((event) => {
+      event.preventDefault();
+      win.webContents.send('exportContentReq', 'quitAfterSave');
+    }));
   },
   createSettingsWindow(parentWindow) {
     const settings = new BrowserWindow({

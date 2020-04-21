@@ -2,7 +2,7 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 // eslint-disable-next-line import/no-extraneous-dependencies
-const { dialog, ipcMain } = require('electron');
+const { dialog, ipcMain, BrowserWindow } = require('electron');
 
 function notifyInsertMarkdown(window, contentDelta, indexDelta) {
   window.webContents.send('insertMarkdown', contentDelta);
@@ -10,7 +10,6 @@ function notifyInsertMarkdown(window, contentDelta, indexDelta) {
 }
 
 function insertMarkdown(window, shortcode) {
-  // eslint-disable-next-line default-case
   switch (shortcode) {
     case 'h1':
       notifyInsertMarkdown(window, '# ', 0);
@@ -69,7 +68,10 @@ function insertMarkdown(window, shortcode) {
     case 'hr':
       notifyInsertMarkdown(window, `${os.EOL}---${os.EOL}${os.EOL}`, 0);
       break;
+    default:
+      break;
   }
+  window.webContents.send('renderMarkdown');
 }
 
 function openFile(window) {
@@ -93,19 +95,102 @@ function openFile(window) {
       path: filePath,
       title: fileTitle,
       content: fileContent,
-    });
+    }, false);
   }
 }
 
-ipcMain.on('openFileError', ((event, errorType) => {
-  switch (errorType) {
-    case 'unsavedChange':
-      dialog.showErrorBox('警告', '您有未保存的变动。');
+function saveAsFile(window, res) {
+  const saveAsPath = dialog.showSaveDialogSync(window, {
+    title: '保存文件',
+    filters: [
+      {
+        name: 'Markdown 文件',
+        extensions: ['md'],
+      },
+    ],
+  });
+  if (saveAsPath) {
+    fs.writeFileSync(saveAsPath, res.mdSource, {
+      encoding: 'utf8',
+    });
+    window.webContents.send('updateFile', {
+      path: saveAsPath,
+      title: path.basename(saveAsPath),
+    });
+    window.webContents.send('updateTitle');
+  }
+}
+
+function saveFile(window, res) {
+  if (res.path === '') {
+    saveAsFile(window, res);
+  } else {
+    fs.writeFileSync(res.path, res.mdSource, {
+      encoding: 'utf8',
+    });
+    window.webContents.send('updateTitle');
+  }
+}
+
+ipcMain.on('operationError', ((event, errorInfo) => {
+  const window = BrowserWindow.fromWebContents(event.sender);
+  let clickedBtnIndex;
+  switch (errorInfo.error) {
+    case 'unsavedChangeWhenOpenNewDoc':
+      // eslint-disable-next-line no-case-declarations
+      clickedBtnIndex = dialog.showMessageBoxSync(window, {
+        type: 'warning',
+        buttons: ['继续打开新文件', '取消打开新文件'],
+        title: '警告',
+        message: '您尚有未保存的改动',
+        detail: '当前操作会丢弃任何未保存的改动且无法恢复，请确认是否继续打开新文件？',
+      });
+      if (clickedBtnIndex === 0) {
+        event.sender.send('openFile', errorInfo.openInfo, true);
+      }
       break;
     default:
       break;
   }
 }));
+
+ipcMain.on('exportContentRes', (event, res) => {
+  const window = BrowserWindow.fromWebContents(event.sender);
+  switch (res.next) {
+    case 'quitAfterSave':
+      if (!res.changeSaved) {
+        const clickedBtnIndex = dialog.showMessageBoxSync(window, {
+          type: 'warning',
+          buttons: ['丢弃改动并退出', '保存并退出', '取消退出'],
+          title: '警告',
+          message: '您尚有未保存的改动',
+          detail: '当前操作会丢弃任何未保存的改动且无法恢复，请确认是否继续退出？',
+        });
+        switch (clickedBtnIndex) {
+          case 0:
+            window.destroy();
+            break;
+          case 1:
+            saveFile(window, res);
+            window.destroy();
+            break;
+          default:
+            break;
+        }
+      } else {
+        window.destroy();
+      }
+      break;
+    case 'save':
+      saveFile(window, res);
+      break;
+    case 'saveAs':
+      saveAsFile(window, res);
+      break;
+    default:
+      break;
+  }
+});
 
 module.exports = {
   insertMarkdown,
