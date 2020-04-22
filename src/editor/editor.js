@@ -14,6 +14,8 @@ let title = 'Untitled.md';
 let path = '';
 let changeSaved = true;
 
+let userSettings = store.get('userSettings');
+
 const renderer = new marked.Renderer();
 renderer.code = (code, language) => {
   if ((code.match(/^sequenceDiagram/) || code.match(/^graph/)) && language.match(/mermaid/)) {
@@ -53,19 +55,36 @@ mdSourceEl.addEventListener('keypress', (event) => {
   renderMarkdown(event);
 });
 
-ipcRenderer.on('insertMarkdown', ((event, insertContent) => {
+function insertMarkdown(insertContent) {
   mdSourceEl.focus();
   const prevSelectStart = mdSourceEl.selectionStart;
   mdSourceEl.value = `${mdSourceEl.value.substring(0, prevSelectStart)}${insertContent}${mdSourceEl.value.substring(prevSelectStart)}`;
   mdSourceEl.selectionStart = prevSelectStart + insertContent.length;
   mdSourceEl.selectionEnd = prevSelectStart + insertContent.length;
-}));
+}
 
-ipcRenderer.on('shiftCursor', ((event, indexDelta) => {
+function shiftCursor(indexDelta) {
   mdSourceEl.focus();
   const prevSelectStart = mdSourceEl.selectionStart;
   const prevSelectEnd = mdSourceEl.selectionEnd;
   mdSourceEl.setSelectionRange(prevSelectStart + indexDelta, prevSelectEnd + indexDelta);
+}
+
+mdSourceEl.addEventListener('keyup', (event) => {
+  if (event.key === 'Tab') {
+    for (let i = 0; i < parseInt(userSettings.edit.tabSize, 10); i += 1) {
+      insertMarkdown(' ');
+    }
+    renderMarkdown(null);
+  }
+});
+
+ipcRenderer.on('insertMarkdown', ((event, insertContent) => {
+  insertMarkdown(insertContent);
+}));
+
+ipcRenderer.on('shiftCursor', ((event, indexDelta) => {
+  shiftCursor(indexDelta);
 }));
 
 ipcRenderer.on('openFile', ((event, openInfo, override) => {
