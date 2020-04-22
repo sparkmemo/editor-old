@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { app, BrowserWindow } = require('electron');
 const { createEditorWindow } = require('./src/window.js');
+require('./src/userSettings.js');
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

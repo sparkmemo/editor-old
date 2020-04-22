@@ -149,6 +149,15 @@ ipcMain.on('operationError', ((event, errorInfo) => {
         event.sender.send('openFile', errorInfo.openInfo, true);
       }
       break;
+    case 'settingsTabSizeEmpty':
+      dialog.showErrorBox('无法保存您的偏好设置', '设置 "编辑 > Tab 键大小" 中的值不应为空。');
+      break;
+    case 'settingsCustomFontSizeEmpty':
+      dialog.showErrorBox('无法保存您的偏好设置', '设置 "编辑 > 字体大小" 中的值不应为空。');
+      break;
+    case 'settingsPicSavePathEmpty':
+      dialog.showErrorBox('无法保存您的偏好设置', '设置 "导出 > 图片转存文件夹" 中的值不应为空。');
+      break;
     default:
       break;
   }
@@ -190,6 +199,11 @@ ipcMain.on('exportContentRes', (event, res) => {
     default:
       break;
   }
+});
+
+ipcMain.on('destroySettingsWindow', (event) => {
+  const window = BrowserWindow.fromWebContents(event.sender);
+  window.destroy();
 });
 
 module.exports = {

@@ -5,6 +5,7 @@ require('./mathjax-config.js');
 require('mathjax/es5/tex-svg.js');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { ipcRenderer } = require('electron');
+const { store } = require('../userSettings.js');
 
 const mdSourceEl = document.getElementById('mdSource');
 const mdOutputEl = document.getElementById('mdOutput');

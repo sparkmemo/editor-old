@@ -279,7 +279,7 @@ module.exports = [
         type: 'separator',
       },
       {
-        label: '全选',
+        label: '重置缩放',
         role: 'resetZoom',
       },
       {

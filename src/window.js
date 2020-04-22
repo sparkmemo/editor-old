@@ -36,5 +36,9 @@ module.exports = {
     });
     settings.loadFile(path.join('src', 'settings', 'settings.html'));
     settings.webContents.openDevTools();
+    settings.on('close', (event) => {
+      event.preventDefault();
+      settings.webContents.send('saveSettingsOnQuit');
+    });
   },
 };
