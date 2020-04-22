@@ -61,7 +61,7 @@
                                 </v-row>
                                 <v-row justify="center" align="center" class="mt-n4">
                                     <v-col cols="3">
-                                        <p class="text-left pl-4">字体</p>
+                                        <p class="text-left pl-4">自定义字体</p>
                                     </v-col>
                                     <v-col cols="9" class="pb-0">
                                         <v-text-field
@@ -69,12 +69,13 @@
                                                 filled
                                                 dense
                                                 prepend-inner-icon="mdi-format-font"
+                                                clearable
                                         ></v-text-field>
                                     </v-col>
                                 </v-row>
                                 <v-row justify="center" align="center" class="mt-n4">
                                     <v-col cols="3">
-                                        <p class="text-left pl-4">字体大小</p>
+                                        <p class="text-left pl-4">自定义字体大小</p>
                                     </v-col>
                                     <v-col cols="9" class="pb-0">
                                         <v-text-field
@@ -122,15 +123,15 @@
                                         <p class="text-left pl-4">自定义 CSS 样式</p>
                                     </v-col>
                                     <v-col cols="9" class="pb-0">
-                                        <v-file-input
+                                        <v-text-field
                                                 v-model="userSettings.render.customCSS"
                                                 filled
                                                 dense
-                                                prepend-icon=""
                                                 prepend-inner-icon="mdi-file-code-outline"
-                                                clear-icon=""
-                                                accept=".css"
-                                        ></v-file-input>
+                                                readonly
+                                                @click="chooseCustomCSSPath"
+                                                clearable
+                                        ></v-text-field>
                                     </v-col>
                                 </v-row>
                             </v-tab-item>
@@ -162,6 +163,7 @@
                                                 prepend-inner-icon="mdi-folder-move-outline"
                                                 @click="choosePicSavePath"
                                                 readonly
+                                                clearable
                                         ></v-text-field>
                                     </v-col>
                                 </v-row>

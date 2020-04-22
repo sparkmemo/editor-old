@@ -9,6 +9,8 @@ const { store } = require('../userSettings.js');
 
 const mdSourceEl = document.getElementById('mdSource');
 const mdOutputEl = document.getElementById('mdOutput');
+const codeThemeEl = document.getElementById('codeTheme');
+const customCSSEL = document.getElementById('customCSS');
 
 let title = 'Untitled.md';
 let path = '';
@@ -43,7 +45,7 @@ function renderMarkdown(e) {
   } catch (err) {
     // handling mermaid error
   }
-  if (e === null || !(e.key === 'Control' || e.key === 'Shift' || e.ctrlKey === true || e.shiftKey === true)) {
+  if (e === undefined || !(e.key === 'Control' || e.key === 'Shift' || e.ctrlKey === true || e.shiftKey === true)) {
     changeSaved = false;
   }
   updateTitle();
@@ -51,9 +53,9 @@ function renderMarkdown(e) {
 
 updateTitle();
 
-mdSourceEl.addEventListener('keypress', (event) => {
-  renderMarkdown(event);
-});
+// mdSourceEl.addEventListener('keydown', (event) => {
+//   renderMarkdown(event);
+// });
 
 function insertMarkdown(insertContent) {
   mdSourceEl.focus();
@@ -75,9 +77,31 @@ mdSourceEl.addEventListener('keyup', (event) => {
     for (let i = 0; i < parseInt(userSettings.edit.tabSize, 10); i += 1) {
       insertMarkdown(' ');
     }
-    renderMarkdown(null);
   }
+  renderMarkdown(event);
 });
+
+function loadUserSettings() {
+  const codeThemeURL = `../../node_modules/highlight.js/styles/${userSettings.render.codeHighlightTheme}.css`;
+  codeThemeEl.setAttribute('href', codeThemeURL);
+  if (userSettings.edit.customFontFamily) {
+    mdSourceEl.style.fontFamily = userSettings.edit.customFontFamily;
+  } else {
+    mdSourceEl.style.fontFamily = '';
+  }
+  if (userSettings.edit.customFontSize) {
+    mdSourceEl.style.fontSize = `${userSettings.edit.customFontSize}px`;
+  } else {
+    mdSourceEl.style.fontSize = '';
+  }
+  if (userSettings.render.customCSS) {
+    customCSSEL.setAttribute('href', userSettings.render.customCSS);
+  } else {
+    customCSSEL.setAttribute('href', '');
+  }
+}
+
+loadUserSettings();
 
 ipcRenderer.on('insertMarkdown', ((event, insertContent) => {
   insertMarkdown(insertContent);
@@ -125,5 +149,10 @@ ipcRenderer.on('updateTitle', (e) => {
 });
 
 ipcRenderer.on('renderMarkdown', () => {
-  renderMarkdown(null);
+  renderMarkdown();
+});
+
+ipcRenderer.on('updateSettings', ()=> {
+  userSettings = store.get('userSettings');
+  loadUserSettings();
 });

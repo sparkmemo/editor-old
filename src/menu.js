@@ -47,7 +47,7 @@ module.exports = [
       {
         label: '设置',
         accelerator: 'CmdOrCtrl+,',
-        click(parentWindow) {
+        click(menuIte, parentWindow) {
           // eslint-disable-next-line global-require
           require('./window.js').createSettingsWindow(parentWindow);
         },

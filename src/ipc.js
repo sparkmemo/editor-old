@@ -203,6 +203,8 @@ ipcMain.on('exportContentRes', (event, res) => {
 
 ipcMain.on('destroySettingsWindow', (event) => {
   const window = BrowserWindow.fromWebContents(event.sender);
+  const parentWindow = window.getParentWindow();
+  parentWindow.webContents.send('updateSettings');
   window.destroy();
 });
 

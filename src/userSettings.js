@@ -7,9 +7,9 @@ const store = new Store({
         displayLang: 'zhCN',
       },
       edit: {
-        tabSize: 6,
+        tabSize: 4,
         customFontFamily: null,
-        customFontSize: null,
+        customFontSize: 16,
       },
       render: {
         markdownTheme: 'github',

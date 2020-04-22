@@ -22,12 +22,28 @@ const vm = new Vue({
   methods: {
     choosePicSavePath() {
       const pathList = dialog.showOpenDialogSync({
-        title: '图片转存路径',
+        title: '选择图片转存路径',
         defaultPath: this.userSettings.export.picSavePath || '',
         properties: ['openDirectory'],
       });
       if (pathList !== undefined) {
         this.userSettings.export.picSavePath = pathList[0];
+      }
+    },
+    chooseCustomCSSPath() {
+      const pathList = dialog.showOpenDialogSync({
+        title: '选择自定义 CSS 样式表路径',
+        defaultPath: this.userSettings.render.customCSS || '',
+        properties: ['openFile'],
+        filters: [
+          {
+            name: 'CSS 样式表',
+            extensions: ['css'],
+          },
+        ],
+      });
+      if (pathList !== undefined) {
+        this.userSettings.render.customCSS = pathList[0];
       }
     },
   },
@@ -48,7 +64,7 @@ function validateSettings() {
     });
     return false;
   }
-  if (userSettings.export.picProcess === 'copyToPath' && userSettings.export.picSavePath === '') {
+  if (userSettings.export.picProcess === 'copyToPath' && userSettings.export.picSavePath === null) {
     ipcRenderer.send('operationError', {
       error: 'settingsPicSavePathEmpty',
     });
