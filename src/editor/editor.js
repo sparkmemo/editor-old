@@ -5,6 +5,8 @@ require('./mathjax-config.js');
 require('mathjax/es5/tex-svg.js');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { ipcRenderer } = require('electron');
+const url = require('url');
+const os = require('os');
 const { store } = require('../userSettings.js');
 
 const mdSourceEl = document.getElementById('mdSource');
@@ -79,6 +81,16 @@ mdSourceEl.addEventListener('keyup', (event) => {
     }
   }
   renderMarkdown(event);
+});
+
+mdSourceEl.addEventListener('drop', (event) => {
+  event.preventDefault();
+  // eslint-disable-next-line
+  for (let file of event.dataTransfer.files) {
+    const fileURL = url.pathToFileURL(file.path).href;
+    insertMarkdown(`${os.EOL}![](${fileURL})${os.EOL}`);
+    renderMarkdown();
+  }
 });
 
 function loadUserSettings() {
