@@ -34,10 +34,11 @@ module.exports = [
         label: '导出',
         submenu: [
           {
-            label: '导出至 HTML',
-          },
-          {
             label: '导出至 PDF',
+            click(menuItem, parentWindow) {
+              // eslint-disable-next-line global-require
+              require('./window.js').createHiddenPDFWindow(parentWindow);
+            },
           },
         ],
       },

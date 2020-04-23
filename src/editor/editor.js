@@ -1,7 +1,7 @@
 const marked = require('marked');
 const hljs = require('highlight.js');
 const mermaid = require('mermaid/dist/mermaid.js');
-require('./mathjax-config.js');
+require('../mathjax-config.js');
 require('mathjax/es5/tex-svg.js');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { ipcRenderer } = require('electron');
@@ -20,13 +20,21 @@ let changeSaved = true;
 
 let userSettings = store.get('userSettings');
 
+function escapeHTML(raw) {
+  const safe = raw.replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+  return safe;
+}
+
 const renderer = new marked.Renderer();
 renderer.code = (code, language) => {
   if ((code.match(/^sequenceDiagram/) || code.match(/^graph/)) && language.match(/mermaid/)) {
     return `<div class="mermaid">${code}</div>`;
   }
-
-  return `<pre><code>${code}</code></pre>`;
+  return `<pre><code class="language-${language}">${escapeHTML(code)}</code></pre>`;
 };
 
 mermaid.initialize({ startOnLoad: false, theme: 'forest' });
@@ -145,6 +153,11 @@ ipcRenderer.on('exportContentReq', (event, next) => {
     path,
     changeSaved,
     mdSource: mdSourceEl.value,
+    mdOutput: marked(mdSourceEl.value, { renderer }),
+    settings: {
+      codeThemeLink: codeThemeEl.getAttribute('href'),
+      customCSSLink: customCSSEL.getAttribute('href'),
+    },
     next,
   });
 });

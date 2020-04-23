@@ -1,6 +1,9 @@
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
+const jsdom = require('jsdom');
+
+const { JSDOM } = jsdom;
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { dialog, ipcMain, BrowserWindow } = require('electron');
 
@@ -132,6 +135,59 @@ function saveFile(window, res) {
   }
 }
 
+function exportPDF(window, res) {
+  const savePath = dialog.showSaveDialogSync(window, {
+    title: '选择导出文件的保存路径',
+    filters: [
+      {
+        name: 'PDF 文件',
+        extensions: ['PDF'],
+      },
+    ],
+    defaultPath: '' || res.path,
+  });
+  if (savePath) {
+    const baseContent = fs.readFileSync(path.join('src', 'exportPDF', 'exportPDF.html'), {
+      encoding: 'utf8',
+    });
+    const base = new JSDOM(baseContent);
+    base.window.document.getElementById('codeTheme').setAttribute('href', res.settings.codeThemeLink);
+    base.window.document.getElementById('customCSS').setAttribute('href', res.settings.customCSSLink);
+    base.window.document.getElementById('mdOutput').innerHTML = res.mdOutput;
+    const exportContent = base.window.document.documentElement.innerHTML;
+    const exportFileName = `exportPDF-${Date.now()}.html`;
+    const exportFilePath = path.join('src', 'exportPDF', exportFileName);
+    fs.appendFileSync(exportFilePath, exportContent, {
+      encoding: 'utf8',
+    });
+    //
+    const exportWindow = new BrowserWindow({
+      parent: window,
+      modal: true,
+      width: 800,
+      height: 600,
+      show: false,
+      webPreferences: {
+        nodeIntegration: true,
+      },
+    });
+    exportWindow.loadFile(exportFilePath);
+    exportWindow.webContents.on('did-finish-load', () => {
+      exportWindow.webContents.printToPDF({
+        marginsType: 0,
+        pageSize: 'A4',
+        printBackground: true,
+        printSelectionOnly: false,
+        landscape: false,
+      }).then((data) => {
+        fs.writeFileSync(savePath, data);
+        exportWindow.close();
+        fs.unlinkSync(exportFilePath);
+      });
+    });
+  }
+}
+
 ipcMain.on('operationError', ((event, errorInfo) => {
   const window = BrowserWindow.fromWebContents(event.sender);
   let clickedBtnIndex;
@@ -195,6 +251,9 @@ ipcMain.on('exportContentRes', (event, res) => {
       break;
     case 'saveAs':
       saveAsFile(window, res);
+      break;
+    case 'exportPDF':
+      exportPDF(window, res);
       break;
     default:
       break;

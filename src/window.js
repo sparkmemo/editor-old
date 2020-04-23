@@ -41,4 +41,7 @@ module.exports = {
       settings.webContents.send('saveSettingsOnQuit');
     });
   },
+  createHiddenPDFWindow(parentWindow) {
+    parentWindow.webContents.send('exportContentReq', 'exportPDF');
+  },
 };

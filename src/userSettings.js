@@ -25,7 +25,7 @@ const store = new Store({
 });
 
 // store.reset('userSettings');
-console.log(store.get('userSettings'));
+// console.log(store.get('userSettings'));
 
 module.exports = {
   store,
