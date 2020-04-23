@@ -5,7 +5,7 @@ const jsdom = require('jsdom');
 
 const { JSDOM } = jsdom;
 // eslint-disable-next-line import/no-extraneous-dependencies
-const { dialog, ipcMain, BrowserWindow } = require('electron');
+const { dialog, ipcMain, BrowserWindow, shell } = require('electron');
 
 function notifyInsertMarkdown(window, contentDelta, indexDelta) {
   window.webContents.send('insertMarkdown', contentDelta);
@@ -141,7 +141,7 @@ function exportPDF(window, res) {
     filters: [
       {
         name: 'PDF 文件',
-        extensions: ['PDF'],
+        extensions: ['pdf'],
       },
     ],
     defaultPath: '' || res.path,
@@ -180,9 +180,13 @@ function exportPDF(window, res) {
         printSelectionOnly: false,
         landscape: false,
       }).then((data) => {
-        fs.writeFileSync(savePath, data);
-        exportWindow.close();
+        if (fs.existsSync(savePath)) {
+          fs.unlinkSync(savePath);
+        }
+        fs.appendFileSync(savePath, data);
         fs.unlinkSync(exportFilePath);
+        exportWindow.close();
+        shell.openItem(savePath);
       });
     });
   }

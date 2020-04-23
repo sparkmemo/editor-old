@@ -4,4 +4,4 @@ require('../mathjax-config.js');
 require('mathjax/es5/tex-svg.js');
 
 hljs.initHighlightingOnLoad();
-mermaid.initialize({ startOnLoad: false, theme: 'forest' });
+mermaid.initialize({ startOnLoad: true, theme: 'forest' });
